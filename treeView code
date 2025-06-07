@@ -1,0 +1,141 @@
+namespace WinFormsApp1
+{
+    public partial class Form1 : Form
+    {
+
+        public Form1()
+        {
+            InitializeComponent();
+            numericUpDown1.Maximum = treeView1.Nodes.Count;
+            numericUpDown2.Maximum = treeView1.Nodes.Count;
+        }
+        private bool DisableSelection = false;
+
+        private void ChangeTreeNodesColor(TreeNodeCollection nodes)
+        {
+            foreach (TreeNode node in nodes)
+            {
+                node.ForeColor = Color.Red;
+                if (node.Nodes.Count > 0)
+                    ChangeTreeNodesColor(node.Nodes);
+            }
+        }
+        private void AddNodes()
+        {
+            // method 1
+            TreeNode child1 = new TreeNode("saif",/*children*/ new TreeNode[] { new TreeNode("ahmad"), new TreeNode("saif") });
+            TreeNode child2 = new TreeNode("tala");
+
+            treeView1.Nodes.AddRange(new TreeNode[] { child1, child2 });
+
+            // method 2
+
+            treeView1.Nodes.Add("rami"); // directly
+            treeView1.Nodes.Add(new TreeNode("jasem")); // using tree node obj
+
+
+            numericUpDown1.Maximum = numericUpDown2.Maximum = treeView1.Nodes.Count;
+
+        }
+        private void RemoveNode()
+        {
+            treeView1.Nodes.RemoveAt((int)numericUpDown1.Value - 1);
+            numericUpDown1.Maximum = --numericUpDown2.Maximum;
+
+        }
+        private void RemoveAllNodes()
+        {
+            for (int i = treeView1.Nodes.Count - 1; i >= 0; i--)
+            {
+                if (treeView1.Nodes[i].Nodes.Count != 0)
+                    treeView1.Nodes[i].Nodes.Clear();
+                treeView1.Nodes.Remove(treeView1.Nodes[i]);
+            }
+            numericUpDown1.Maximum = numericUpDown2.Maximum = 0;
+        }
+        private void UpdateNode()
+        {
+            treeView1.Nodes[0].Text = "mohamad";
+        }
+        private void UpdateNodeAndChildren(TreeNode nodes)
+        {
+            nodes.Text = textBox1.Text;
+            foreach (TreeNode childNode in nodes.Nodes)
+            {
+                if (childNode.Nodes.Count > 0)
+                    UpdateNodeAndChildren(childNode);
+                else
+                    childNode.Text = textBox1.Text;
+
+            }
+        }
+        private void ChangeCheckedNodesBg(TreeNodeCollection ParentNode)
+        {
+            foreach (TreeNode childNode in ParentNode)
+            {
+                if(childNode.Checked)
+                    childNode.BackColor = Color.Red;
+                if (childNode.Nodes.Count != 0)
+                    ChangeCheckedNodesBg(childNode.Nodes);
+            }
+        }
+        
+        //buttons
+        private void button1_Click(object sender, EventArgs e)
+        {
+            ChangeTreeNodesColor(treeView1.Nodes);
+        }
+        private void button2_Click(object sender, EventArgs e)
+        {
+            AddNodes();
+        }
+        private void button3_Click(object sender, EventArgs e)
+        {
+            RemoveNode();
+        }
+        private void button4_Click(object sender, EventArgs e)
+        {
+            RemoveAllNodes();
+        }
+        private void button5_Click(object sender, EventArgs e)
+        {
+            UpdateNode();
+        }
+        private void button6_Click(object sender, EventArgs e)
+        {
+            UpdateNodeAndChildren(treeView1.Nodes[(int)numericUpDown2.Value - 1]);
+        }
+
+        private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+            label1.Text = e.Node.Text;
+        }
+        private void treeView1_AfterCheck(object sender, TreeViewEventArgs e)
+        {
+            label4.Text = e.Node.Text;
+        }
+        private void treeView1_BeforeSelect(object sender, TreeViewCancelEventArgs e)
+        {
+            e.Cancel = DisableSelection;
+        }
+
+        private void button7_Click(object sender, EventArgs e)
+        {
+            if (DisableSelection)
+            {
+                DisableSelection = false;
+                button7.Text = "Disable Selection";
+            }
+            else
+            {
+                DisableSelection = true;
+                button7.Text = "Enable Selection";
+            }
+        }
+
+        private void button8_Click(object sender, EventArgs e)
+        {
+            ChangeCheckedNodesBg(treeView1.Nodes);
+        }
+    }
+}
